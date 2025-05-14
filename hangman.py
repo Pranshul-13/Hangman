@@ -1,117 +1,120 @@
 import random
 
-def play(word):                       
+def play(word):
+    # Setup initial game state
+    display_word = ['_'] * len(word)
+    lives = 5
+    guessed_letters = set()
+    hangman_stages = [
+        '''
+           _____ 
+          |     
+          |     
+          |     
+          |     
+          |     
+          |     
+        __|__
+        ''',
+        '''
+           _____ 
+          |     | 
+          |     | 
+          |      
+          |      
+          |      
+          |      
+        __|__
+        ''',
+        '''
+           _____ 
+          |     | 
+          |     | 
+          |     | 
+          |      
+          |      
+          |      
+        __|__
+        ''',
+        '''
+           _____ 
+          |     | 
+          |     | 
+          |     | 
+          |     O 
+          |      
+          |      
+        __|__
+        ''',
+        '''
+           _____ 
+          |     | 
+          |     | 
+          |     | 
+          |     O 
+          |    /|\\ 
+          |    / \\ 
+        __|__
+        '''
+    ]
 
-  display_word = '_' * len(word)              
-  count = 0                              
-  lives = 5                              
+    print(f"\n{' '.join(display_word)}")
+    
+    while lives > 0:
+        guess = input("\nEnter your guess: ").strip().lower()
 
-  while count < lives:                   
+        # Validate single letter input
+        if len(guess) != 1 or not guess.isalpha():
+            print("Invalid input. Please enter a single letter.")
+            continue
 
-      guess = input(f'Hangman Word: {display_word} Enter your guess: \n') 
+        # Check for repeated guesses
+        if guess in guessed_letters:
+            print(f"You already guessed '{guess}'. Try a different letter.")
+            continue
 
-      if guess in word:                                             
-          index = word.index(guess)                                    
-          display_word = display_word[:index] + guess + display_word[index + 1:]      
+        # Add to guessed letters set
+        guessed_letters.add(guess)
 
-      else:
-          count += 1
-          
-          if count == 1:
-              print('   _____ \n'
-                    '  |      \n'
-                    '  |      \n'
-                    '  |      \n'
-                    '  |      \n'
-                    '  |      \n'
-                    '  |      \n'
-                    '__|__\n')
-              print(f'Wrong guess.\n Guesses remaining: {lives - count}\n')
+        # Correct guess
+        if guess in word:
+            for i, char in enumerate(word):
+                if char == guess:
+                    display_word[i] = guess
 
-          elif count == 2:
-              print('   _____ \n'
-                    '  |     | \n'
-                    '  |     | \n'
-                    '  |      \n'
-                    '  |      \n'
-                    '  |      \n'
-                    '  |      \n'
-                    '__|__\n')
-              print(f'Wrong guess.\n Guesses remaining: {lives - count}\n')
+            print("\n" + ' '.join(display_word))
 
-          elif count == 3:
-              print('   _____ \n'
-                    '  |     | \n'
-                    '  |     | \n'
-                    '  |     | \n'
-                    '  |      \n'
-                    '  |      \n'
-                    '  |      \n'
-                    '__|__\n')
-              print(f'Wrong guess.\n Guesses remaining: {lives - count}\n')
+            # Check for win
+            if ''.join(display_word) == word:
+                print(f"\n🎉 Congratulations! You guessed the correct word: {word}")
+                break
+        # Incorrect guess
+        else:
+            lives -= 1
+            print(hangman_stages[5 - lives])  # Show the current hangman stage
+            print(f"Wrong guess. Guesses remaining: {lives}\n")
 
-          elif count == 4:
-              print('   _____ \n'
-                    '  |     | \n'
-                    '  |     | \n'
-                    '  |     | \n'
-                    '  |     O \n'
-                    '  |      \n'
-                    '  |      \n'
-                    '__|__\n')
-              print(f'Wrong guess.\n Guesses remaining: {lives - count}\n')
+        # Game over
+        if lives == 0:
+            print(f"💀 Game over! The word was: {word}")
 
-          elif count == 5:
-              print('   _____ \n'
-                    '  |     | \n'
-                    '  |     | \n'
-                    '  |     | \n'
-                    '  |     O \n'
-                    '  |    /|\ \n'
-                    '  |    / \ \n'
-                    '__|__\n')
-              print('Wrong guess. You\'ve been hanged!!!\n')
-              print(f'The word was: {word}')
+# Game Introduction
+print("Welcome to the Hangman Game\n")
+name = input("Enter your name: ")
+print(f"Hello {name}! Let's get started.")
 
-      if display_word == word:
-          print(f'Congratulations! You have guessed the corect word.')
-          break
-
-
-
-
-
-print('Welcome to the Hangman Game\n')
-name = input('Enter your name: ')
-print(f'Hello {name}! \nLet\'s get started -')
-
+# Word bank
 words_to_guess = [
-    "apple",
-    "dog",
-    "cat",
-    "book",
-    "tree",
-    "mountain",
-    "ocean",
-    "car",
-    "house",
-    "sun",
-    "moon",
-    "flower",
-    "river",
-    "computer",
-    "friend",
-    "city",
-    "child",
-    "song",
-    "bird",
-    "time"
+    "apple", "dog", "cat", "book", "tree", "mountain", "ocean",
+    "car", "house", "sun", "moon", "flower", "river", "computer",
+    "friend", "city", "child", "song", "bird", "time"
 ]
 
-
+# Main game loop
 while True:
-       word = random.choice(words_to_guess)
-       play(word)
-       option = input('\nPlay again? (y/n) :')
-       if(option=='n'):
-       	   break
+    word = random.choice(words_to_guess)
+    play(word)
+    option = input("\nPlay again? (y/n): ").strip().lower()
+    if option == 'n':
+        print("\nThanks for playing! Goodbye!")
+        break
